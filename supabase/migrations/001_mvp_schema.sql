@@ -28,6 +28,7 @@ create table if not exists public.player_game_stats (
   turnovers integer not null default 0 check (turnovers >= 0),
   made_baskets integer not null default 0 check (made_baskets >= 0),
   made_free_throws integer not null default 0 check (made_free_throws >= 0),
+  missed_free_throws integer not null default 0 check (missed_free_throws >= 0),
   assessment_score integer check (assessment_score between 1 and 5),
   assessment_summary text,
   created_at timestamptz not null default timezone('utc', now()),

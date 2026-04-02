@@ -8,6 +8,7 @@ type StatLine = Pick<
   | "turnovers"
   | "made_baskets"
   | "made_free_throws"
+  | "missed_free_throws"
 >;
 
 export function calculateAssessment(stats: StatLine): AssessmentResult {
@@ -17,6 +18,7 @@ export function calculateAssessment(stats: StatLine): AssessmentResult {
     stats.steals * 2 +
     stats.made_baskets * 2 +
     stats.made_free_throws -
+    stats.missed_free_throws -
     stats.turnovers * 2;
 
   const score =
@@ -44,6 +46,10 @@ function buildSummary(stats: StatLine, score: number) {
     notes.push("led the scoring load");
   } else if (stats.made_baskets + stats.made_free_throws >= 3) {
     notes.push("added useful scoring");
+  }
+
+  if (stats.missed_free_throws >= 3) {
+    notes.push("left some points at the line");
   }
 
   if (stats.offensive_rebounds + stats.defensive_rebounds >= 6) {

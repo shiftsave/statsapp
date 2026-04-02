@@ -4,7 +4,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { PlayerReportBrowser } from "@/components/reports/player-report-browser";
 import { SetupCallout } from "@/components/shared/setup-callout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { getGameWithStats } from "@/lib/data";
+import { getGameReportData } from "@/lib/data";
 import { hasSupabaseEnv } from "@/lib/env";
 import { formatGameDate } from "@/lib/format";
 
@@ -22,13 +22,13 @@ export default async function GameReportPage({
   }
 
   const { gameId } = await params;
-  const gameData = await getGameWithStats(gameId);
+  const gameData = await getGameReportData(gameId);
 
   if (!gameData) {
     notFound();
   }
 
-  const { game, stats } = gameData;
+  const { game, stats, questions, answers, notes, historyByPlayer } = gameData;
 
   return (
     <AppShell currentPath="/games">
@@ -44,11 +44,18 @@ export default async function GameReportPage({
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-0 text-sm leading-6 text-slate-600">
-            Players can select their name to view their own stat line, 1-5 assessment, and quick
-            summary for this game.
+            Players can select their name to review their game stats, complete their reflection,
+            and revisit past reflections.
           </CardContent>
         </Card>
-        <PlayerReportBrowser stats={stats} />
+        <PlayerReportBrowser
+          answers={answers}
+          gameId={gameId}
+          historyByPlayer={historyByPlayer}
+          notes={notes}
+          questions={questions}
+          stats={stats}
+        />
       </div>
     </AppShell>
   );

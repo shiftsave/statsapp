@@ -26,10 +26,44 @@ export type PlayerGameStat = {
   turnovers: number;
   made_baskets: number;
   made_free_throws: number;
+  missed_free_throws: number;
   assessment_score: number | null;
   assessment_summary: string | null;
   updated_at: string;
   player?: Player;
+};
+
+export type ReflectionQuestion = {
+  id: string;
+  prompt: string;
+  sort_order: number;
+  is_active: boolean;
+};
+
+export type ReflectionAnswer = {
+  id: string;
+  game_id: string;
+  player_id: string;
+  question_id: string;
+  response_value: 1 | 2 | 3 | 4;
+  response_note?: string | null;
+};
+
+export type ReflectionNote = {
+  id: string;
+  game_id: string;
+  player_id: string;
+  next_game_goal: string | null;
+  favorite_thing: string | null;
+};
+
+export type ReflectionHistoryEntry = {
+  game_id: string;
+  game_date: string;
+  opponent: string | null;
+  location: string | null;
+  answers: ReflectionAnswer[];
+  note: ReflectionNote | null;
 };
 
 export type AssessmentResult = {
@@ -46,4 +80,13 @@ export type DashboardData = {
 export type GameWithStats = {
   game: Game;
   stats: PlayerGameStat[];
+};
+
+export type GameReportData = {
+  game: Game;
+  stats: PlayerGameStat[];
+  questions: ReflectionQuestion[];
+  answers: ReflectionAnswer[];
+  notes: ReflectionNote[];
+  historyByPlayer: Record<string, ReflectionHistoryEntry[]>;
 };

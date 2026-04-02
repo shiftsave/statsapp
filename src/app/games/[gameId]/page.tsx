@@ -3,14 +3,11 @@ import { notFound } from "next/navigation";
 
 import { completeGameAction } from "@/app/actions";
 import { GameStatsBoard } from "@/components/games/game-stats-board";
-import { AppShell } from "@/components/layout/app-shell";
 import { SetupCallout } from "@/components/shared/setup-callout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getGameWithStats } from "@/lib/data";
 import { hasSupabaseEnv } from "@/lib/env";
-import { formatGameDate } from "@/lib/format";
 
 const outlineLinkClass =
   "inline-flex h-10 items-center justify-center rounded-lg border border-input bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground";
@@ -21,11 +18,7 @@ export default async function GameDetailPage({
   params: Promise<{ gameId: string }>;
 }) {
   if (!hasSupabaseEnv) {
-    return (
-      <AppShell currentPath="/games">
-        <SetupCallout />
-      </AppShell>
-    );
+    return <SetupCallout />;
   }
 
   const { gameId } = await params;
@@ -38,42 +31,31 @@ export default async function GameDetailPage({
   const { game, stats } = gameData;
 
   return (
-    <AppShell currentPath="/games">
-      <div className="space-y-5">
-        <Card>
-          <CardHeader>
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <CardTitle className="text-3xl">
-                  {game.opponent ? `vs ${game.opponent}` : "Game session"}
-                </CardTitle>
-                <CardDescription className="mt-2 text-base">
-                  {formatGameDate(game.game_date)}
-                  {game.location ? ` • ${game.location}` : ""}
-                </CardDescription>
-              </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <Badge variant={game.status === "completed" ? "secondary" : "default"}>
-                  {game.status === "completed" ? "Completed" : "In progress"}
-                </Badge>
-                <Link className={outlineLinkClass} href={`/games/${game.id}/report`}>
-                  Open player reports
-                </Link>
-                {game.status !== "completed" ? (
-                  <form action={completeGameAction}>
-                    <input name="game_id" type="hidden" value={game.id} />
-                    <Button type="submit">Complete game</Button>
-                  </form>
-                ) : null}
-              </div>
-            </div>
-          </CardHeader>
-          {game.notes ? (
-            <CardContent className="pt-0 text-sm leading-6 text-slate-600">{game.notes}</CardContent>
-          ) : null}
-        </Card>
+    <div className="min-h-screen bg-[linear-gradient(180deg,_#f8fafc_0%,_#eef2ff_100%)]">
+      <div className="mx-auto flex min-h-screen max-w-7xl flex-col px-4 py-4 sm:px-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-[1.75rem] border bg-white/90 px-4 py-3 shadow-sm backdrop-blur">
+          <div className="flex flex-wrap items-center gap-3">
+            <Link className={outlineLinkClass} href="/games">
+              Back to games
+            </Link>
+            <Badge variant={game.status === "completed" ? "secondary" : "default"}>
+              {game.status === "completed" ? "Completed" : "In progress"}
+            </Badge>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link className={outlineLinkClass} href={`/games/${game.id}/report`}>
+              Player reports
+            </Link>
+            {game.status !== "completed" ? (
+              <form action={completeGameAction}>
+                <input name="game_id" type="hidden" value={game.id} />
+                <Button type="submit">Complete game</Button>
+              </form>
+            ) : null}
+          </div>
+        </div>
         <GameStatsBoard game={game} initialStats={stats} />
       </div>
-    </AppShell>
+    </div>
   );
 }
