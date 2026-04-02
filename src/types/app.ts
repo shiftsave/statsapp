@@ -29,10 +29,31 @@ export type PlayerGameStat = {
   made_baskets: number;
   made_free_throws: number;
   missed_free_throws: number;
+  is_on_court: boolean;
+  total_time_played_seconds: number;
   assessment_score: number | null;
   assessment_summary: string | null;
   updated_at: string;
   player?: Player;
+};
+
+export type GameClock = {
+  id: string;
+  game_id: string;
+  status: "running" | "stopped";
+  current_period: number;
+  elapsed_seconds: number;
+  started_at: string | null;
+};
+
+export type PlayerSubstitution = {
+  id: string;
+  game_id: string;
+  player_in_id: string;
+  player_out_id: string;
+  period: number;
+  elapsed_seconds: number;
+  created_at: string;
 };
 
 export type ReflectionQuestion = {
@@ -82,6 +103,7 @@ export type DashboardData = {
 export type GameWithStats = {
   game: Game;
   stats: PlayerGameStat[];
+  clock: GameClock | null;
 };
 
 export type GameReportData = {

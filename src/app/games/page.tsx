@@ -2,11 +2,13 @@ import { AppShell } from "@/components/layout/app-shell";
 import { CreateGameForm } from "@/components/games/create-game-form";
 import { GameList } from "@/components/games/game-list";
 import { SetupCallout } from "@/components/shared/setup-callout";
-import { getGames } from "@/lib/data";
+import { getGames, getPlayers } from "@/lib/data";
 import { hasSupabaseEnv } from "@/lib/env";
 
 export default async function GamesPage() {
-  const games = hasSupabaseEnv ? await getGames() : [];
+  const [games, players] = hasSupabaseEnv
+    ? await Promise.all([getGames(), getPlayers()])
+    : [[], []];
 
   return (
     <AppShell currentPath="/games">
@@ -24,7 +26,7 @@ export default async function GamesPage() {
                 into post-game reflections.
               </p>
             </section>
-            <CreateGameForm />
+            <CreateGameForm players={players.filter((p) => p.is_active)} />
             <GameList games={games} />
           </>
         ) : null}

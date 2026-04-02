@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { CompleteGameDialog } from "@/components/games/complete-game-dialog";
+import { GameClock } from "@/components/games/game-clock";
 import { GameStatsBoard } from "@/components/games/game-stats-board";
 import { SetupCallout } from "@/components/shared/setup-callout";
 import { getGameWithStats } from "@/lib/data";
@@ -30,7 +31,7 @@ export default async function GameDetailPage({
     notFound();
   }
 
-  const { game, stats } = gameData;
+  const { game, stats, clock } = gameData;
 
   return (
     <div className="h-screen overflow-hidden">
@@ -41,28 +42,21 @@ export default async function GameDetailPage({
             <span className="hidden sm:inline">Back to games</span>
           </Link>
           {game.status !== "completed" ? (
-            <div className="sm:hidden">
+            <>
+              <GameClock gameId={game.id} initialClock={clock} />
               <CompleteGameDialog
                 gameId={game.id}
                 opponentName={game.opponent}
                 triggerClassName={primaryButtonClass}
               />
-            </div>
-          ) : null}
-          <div className="hidden sm:flex sm:items-center sm:gap-3">
+            </>
+          ) : (
             <Link className={outlineButtonClass} href={`/games/${game.id}/report`}>
               Player reports
             </Link>
-            {game.status !== "completed" ? (
-              <CompleteGameDialog
-                gameId={game.id}
-                opponentName={game.opponent}
-                triggerClassName={primaryButtonClass}
-              />
-            ) : null}
-          </div>
+          )}
         </div>
-        <GameStatsBoard game={game} initialStats={stats} />
+        <GameStatsBoard game={game} initialStats={stats} initialClock={clock} />
       </div>
     </div>
   );

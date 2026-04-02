@@ -56,11 +56,17 @@ export async function createGameAction(formData: FormData) {
     throw new Error("Game date is required.");
   }
 
+  const starterIds = String(formData.get("starter_ids") ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+
   const gameId = await createGameWithRoster({
     gameDate,
     opponent: String(formData.get("opponent") ?? "").trim() || null,
     location: String(formData.get("location") ?? "").trim() || null,
     notes: String(formData.get("notes") ?? "").trim() || null,
+    starterIds: starterIds.length > 0 ? starterIds : undefined,
   });
 
   revalidatePath("/");

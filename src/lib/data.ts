@@ -4,10 +4,12 @@ import { createSupabaseServerClient } from "@/lib/supabase/client";
 import type {
   DashboardData,
   Game,
+  GameClock,
   GameReportData,
   GameWithStats,
   Player,
   PlayerGameStat,
+  PlayerSubstitution,
   ReflectionAnswer,
   ReflectionHistoryEntry,
   ReflectionNote,
@@ -24,6 +26,7 @@ type CreateGameInput = {
   opponent?: string | null;
   location?: string | null;
   notes?: string | null;
+  starterIds?: string[];
 };
 
 type StatUpdateInput = Pick<
@@ -50,6 +53,8 @@ function normalizeStatLine(statLine: PlayerGameStat): PlayerGameStat {
     made_baskets: statLine.made_baskets ?? 0,
     made_free_throws: statLine.made_free_throws ?? 0,
     missed_free_throws: statLine.missed_free_throws ?? 0,
+    is_on_court: statLine.is_on_court ?? false,
+    total_time_played_seconds: statLine.total_time_played_seconds ?? 0,
   };
 }
 
@@ -160,16 +165,26 @@ export async function createGameWithRoster(input: CreateGameInput) {
   }
 
   if (players.length > 0) {
+    const starterSet = new Set(input.starterIds ?? []);
     const { error: statsError } = await supabase.from("player_game_stats").insert(
       players.map((player) => ({
         game_id: game.id,
         player_id: player.id,
+        is_on_court: starterSet.has(player.id),
       })),
     );
 
     if (statsError) {
       throw statsError;
     }
+  }
+
+  const { error: clockError } = await supabase
+    .from("game_clock")
+    .insert({ game_id: game.id });
+
+  if (clockError) {
+    throw clockError;
   }
 
   return game.id as string;
@@ -194,14 +209,26 @@ export async function getGameWithStats(gameId: string): Promise<GameWithStats | 
     throw gameError;
   }
 
-  const { data: stats, error: statsError } = await supabase
-    .from("player_game_stats")
-    .select("*, player:players(*)")
-    .eq("game_id", gameId)
-    .order("created_at");
+  const [{ data: stats, error: statsError }, { data: clockRow, error: clockError }] =
+    await Promise.all([
+      supabase
+        .from("player_game_stats")
+        .select("*, player:players(*)")
+        .eq("game_id", gameId)
+        .order("created_at"),
+      supabase
+        .from("game_clock")
+        .select("*")
+        .eq("game_id", gameId)
+        .maybeSingle(),
+    ]);
 
   if (statsError) {
     throw statsError;
+  }
+
+  if (clockError) {
+    throw clockError;
   }
 
   return {
@@ -209,6 +236,7 @@ export async function getGameWithStats(gameId: string): Promise<GameWithStats | 
     stats: (stats as PlayerGameStat[])
       .map(normalizeStatLine)
       .sort((left, right) => (left.player?.name ?? "").localeCompare(right.player?.name ?? "")),
+    clock: (clockRow as GameClock) ?? null,
   };
 }
 
@@ -453,4 +481,97 @@ export async function savePlayerReflection(input: {
   if (notesError) {
     throw notesError;
   }
+}
+
+export async function updateGameClock(
+  gameId: string,
+  update: { status?: "running" | "stopped"; elapsed_seconds?: number; current_period?: number; started_at?: string | null },
+) {
+  const supabase = createSupabaseServerClient();
+  const { error } = await supabase
+    .from("game_clock")
+    .update(update)
+    .eq("game_id", gameId);
+
+  if (error) {
+    throw error;
+  }
+}
+
+export async function performSubstitution(input: {
+  gameId: string;
+  playerInId: string;
+  playerOutId: string;
+  period: number;
+  elapsedSeconds: number;
+}) {
+  const supabase = createSupabaseServerClient();
+
+  // Log the substitution event
+  const { error: subError } = await supabase.from("player_substitutions").insert({
+    game_id: input.gameId,
+    player_in_id: input.playerInId,
+    player_out_id: input.playerOutId,
+    period: input.period,
+    elapsed_seconds: input.elapsedSeconds,
+  });
+
+  if (subError) {
+    throw subError;
+  }
+
+  // Swap court status
+  const { error: inError } = await supabase
+    .from("player_game_stats")
+    .update({ is_on_court: true })
+    .eq("game_id", input.gameId)
+    .eq("player_id", input.playerInId);
+
+  if (inError) {
+    throw inError;
+  }
+
+  const { error: outError } = await supabase
+    .from("player_game_stats")
+    .update({ is_on_court: false })
+    .eq("game_id", input.gameId)
+    .eq("player_id", input.playerOutId);
+
+  if (outError) {
+    throw outError;
+  }
+}
+
+export async function updatePlayerTimePlayed(
+  gameId: string,
+  playerTimes: { playerId: string; totalSeconds: number }[],
+) {
+  const supabase = createSupabaseServerClient();
+
+  for (const { playerId, totalSeconds } of playerTimes) {
+    const { error } = await supabase
+      .from("player_game_stats")
+      .update({ total_time_played_seconds: totalSeconds })
+      .eq("game_id", gameId)
+      .eq("player_id", playerId);
+
+    if (error) {
+      throw error;
+    }
+  }
+}
+
+export async function getSubstitutions(gameId: string): Promise<PlayerSubstitution[]> {
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("player_substitutions")
+    .select("*")
+    .eq("game_id", gameId)
+    .order("elapsed_seconds");
+
+  if (error) {
+    throw error;
+  }
+
+  return data as PlayerSubstitution[];
 }
