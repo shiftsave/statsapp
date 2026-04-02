@@ -43,9 +43,31 @@ export default async function GameReportPage({
               {game.location ? ` • ${game.location}` : ""}
             </CardDescription>
           </CardHeader>
-          <CardContent className="pt-0 text-sm leading-6 text-[#bdd0e7]">
-            Players can select their name to review their game stats, complete their reflection,
-            and revisit past reflections.
+          <CardContent className="space-y-5 pt-0 text-sm leading-6 text-[#bdd0e7]">
+            {game.team_score !== null && game.opponent_score !== null ? (
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-[1.5rem] border border-[#2e86ff]/35 bg-[#0d2137] p-4">
+                  <p className="text-sm uppercase tracking-[0.18em] text-[#7fb2ff]">
+                    Northland Phoenix U16
+                  </p>
+                  <p className="mt-3 text-5xl font-bold uppercase leading-none text-white">
+                    {game.team_score}
+                  </p>
+                </div>
+                <div className="rounded-[1.5rem] border border-white/10 bg-[#0d2137] p-4">
+                  <p className="text-sm uppercase tracking-[0.18em] text-[#bdd0e7]">
+                    {game.opponent || "Opponent"}
+                  </p>
+                  <p className="mt-3 text-5xl font-bold uppercase leading-none text-white">
+                    {game.opponent_score}
+                  </p>
+                </div>
+              </div>
+            ) : null}
+            <p>
+              Players can select their name to review their game stats, complete their reflection,
+              and revisit past reflections.
+            </p>
           </CardContent>
         </Card>
         <PlayerReportBrowser

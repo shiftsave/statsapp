@@ -397,11 +397,18 @@ export async function updateGameStats(statLines: StatUpdateInput[]) {
   }
 }
 
-export async function completeGame(gameId: string) {
+export async function completeGame(
+  gameId: string,
+  scores: { teamScore: number; opponentScore: number },
+) {
   const supabase = createSupabaseServerClient();
   const { error } = await supabase
     .from("games")
-    .update({ status: "completed" })
+    .update({
+      status: "completed",
+      team_score: scores.teamScore,
+      opponent_score: scores.opponentScore,
+    })
     .eq("id", gameId);
 
   if (error) {

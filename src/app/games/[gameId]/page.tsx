@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { completeGameAction } from "@/app/actions";
+import { CompleteGameDialog } from "@/components/games/complete-game-dialog";
 import { GameStatsBoard } from "@/components/games/game-stats-board";
 import { SetupCallout } from "@/components/shared/setup-callout";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { getGameWithStats } from "@/lib/data";
 import { hasSupabaseEnv } from "@/lib/env";
 
@@ -54,12 +53,7 @@ export default async function GameDetailPage({
               Player reports
             </Link>
             {game.status !== "completed" ? (
-              <form action={completeGameAction}>
-                <input name="game_id" type="hidden" value={game.id} />
-                <Button className="min-h-12 rounded-[1rem] bg-[#2e86ff] px-5 uppercase tracking-[0.14em]" type="submit">
-                  Complete game
-                </Button>
-              </form>
+              <CompleteGameDialog gameId={game.id} opponentName={game.opponent} />
             ) : null}
           </div>
         </div>

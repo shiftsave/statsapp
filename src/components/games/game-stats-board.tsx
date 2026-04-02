@@ -381,7 +381,7 @@ export function GameStatsBoard({
       <Dialog open={Boolean(selectedStat)} onOpenChange={(open) => setSelectedPlayerId(open ? selectedPlayerId : null)}>
         {selectedStat ? (
           <DialogContent
-            className="max-h-[90vh] overflow-y-auto sm:max-w-2xl"
+            className="max-h-[92vh] overflow-y-auto sm:max-w-2xl md:max-w-4xl"
             showCloseButton={false}
           >
             <DialogHeader className="flex-row items-start justify-between gap-4">
@@ -398,11 +398,11 @@ export function GameStatsBoard({
               </DialogClose>
             </DialogHeader>
             <div className="space-y-5">
-              <div className="grid grid-cols-2 gap-3 xl:grid-cols-3">
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
                 {statLabels.map((item) => (
                   <div
                     key={item.key}
-                    className={`flex min-h-[220px] flex-col rounded-[1.8rem] border p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ${item.style.cardClassName}`}
+                    className={`flex min-h-[220px] flex-col rounded-[1.8rem] border p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] md:min-h-[180px] md:p-3 ${item.style.cardClassName}`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
@@ -411,7 +411,7 @@ export function GameStatsBoard({
                         >
                           {item.shortLabel}
                         </p>
-                        <p className="mt-3 text-3xl font-medium leading-[1.02] tracking-tight text-slate-900">
+                        <p className="mt-3 text-3xl font-medium leading-[1.02] tracking-tight text-slate-900 md:text-2xl">
                           {item.fullLabel}
                         </p>
                       </div>
@@ -419,9 +419,9 @@ export function GameStatsBoard({
                         {selectedStat[item.key]}
                       </span>
                     </div>
-                    <div className="mt-auto pt-6">
+                    <div className="mt-auto pt-6 md:pt-4">
                       <Button
-                        className="min-h-16 w-full rounded-[1.3rem] bg-[#4a80f0] text-3xl font-medium text-white hover:bg-[#4a80f0]"
+                        className="min-h-16 w-full rounded-[1.3rem] bg-[#4a80f0] text-3xl font-medium text-white hover:bg-[#4a80f0] md:min-h-14 md:text-2xl"
                         onClick={() => adjustStat(selectedStat.id, item.key, 1)}
                         type="button"
                       >
@@ -431,7 +431,7 @@ export function GameStatsBoard({
                   </div>
                 ))}
                 <div
-                  className={`flex min-h-[220px] flex-col rounded-[1.8rem] border p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ${freeThrowStyle.cardClassName}`}
+                  className={`flex min-h-[220px] flex-col rounded-[1.8rem] border p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] md:min-h-[180px] md:p-3 ${freeThrowStyle.cardClassName}`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
@@ -440,7 +440,7 @@ export function GameStatsBoard({
                       >
                         FT
                       </p>
-                      <p className="mt-3 text-3xl font-medium leading-[1.02] tracking-tight text-slate-900">
+                      <p className="mt-3 text-3xl font-medium leading-[1.02] tracking-tight text-slate-900 md:text-2xl">
                         Free throw
                       </p>
                     </div>
@@ -449,16 +449,16 @@ export function GameStatsBoard({
                       {getSafeStatValue(selectedStat.missed_free_throws)}
                     </div>
                   </div>
-                  <div className="mt-auto grid grid-cols-2 gap-3 pt-6">
+                  <div className="mt-auto grid grid-cols-2 gap-3 pt-6 md:pt-4">
                     <Button
-                      className="min-h-16 rounded-[1.3rem] bg-[#4a80f0] text-3xl font-medium text-white hover:bg-[#4a80f0]"
+                      className="min-h-16 rounded-[1.3rem] bg-[#4a80f0] text-3xl font-medium text-white hover:bg-[#4a80f0] md:min-h-14 md:text-2xl"
                       onClick={() => adjustStat(selectedStat.id, "made_free_throws", 1)}
                       type="button"
                     >
                       Made
                     </Button>
                     <Button
-                      className="min-h-16 rounded-[1.3rem] bg-[#071422] text-3xl font-medium text-white hover:bg-[#071422]"
+                      className="min-h-16 rounded-[1.3rem] bg-[#071422] text-3xl font-medium text-white hover:bg-[#071422] md:min-h-14 md:text-2xl"
                       onClick={() => adjustStat(selectedStat.id, "missed_free_throws", 1)}
                       type="button"
                       variant="outline"

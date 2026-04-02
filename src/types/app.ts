@@ -11,6 +11,8 @@ export type Game = {
   game_date: string;
   opponent: string | null;
   location: string | null;
+  team_score: number | null;
+  opponent_score: number | null;
   status: "in_progress" | "completed";
   notes: string | null;
   created_at: string;

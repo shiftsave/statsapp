@@ -72,12 +72,22 @@ export async function completeGameAction(formData: FormData) {
   ensureSupabase();
 
   const gameId = String(formData.get("game_id") ?? "");
+  const teamScore = Number(formData.get("team_score"));
+  const opponentScore = Number(formData.get("opponent_score"));
 
   if (!gameId) {
     throw new Error("Game id is required.");
   }
 
-  await completeGame(gameId);
+  if (!Number.isFinite(teamScore) || teamScore < 0) {
+    throw new Error("Your team score is required.");
+  }
+
+  if (!Number.isFinite(opponentScore) || opponentScore < 0) {
+    throw new Error("Opponent score is required.");
+  }
+
+  await completeGame(gameId, { teamScore, opponentScore });
   revalidatePath(`/games/${gameId}`);
   revalidatePath(`/games/${gameId}/report`);
   revalidatePath("/games");
