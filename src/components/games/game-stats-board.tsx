@@ -31,7 +31,6 @@ type StatKey =
 type StatStyle = {
   cardClassName: string;
   shortLabelClassName: string;
-  helperClassName: string;
 };
 
 const statLabels: {
@@ -47,7 +46,7 @@ const statLabels: {
     style: {
       cardClassName: "border-emerald-200 bg-emerald-50/90",
       shortLabelClassName: "text-emerald-700",
-      helperClassName: "text-emerald-700/80",
+
     },
   },
   {
@@ -57,7 +56,7 @@ const statLabels: {
     style: {
       cardClassName: "border-amber-200 bg-amber-50/95",
       shortLabelClassName: "text-amber-700",
-      helperClassName: "text-amber-700/80",
+
     },
   },
   {
@@ -67,7 +66,7 @@ const statLabels: {
     style: {
       cardClassName: "border-amber-200 bg-amber-50/95",
       shortLabelClassName: "text-amber-700",
-      helperClassName: "text-amber-700/80",
+
     },
   },
   {
@@ -77,7 +76,7 @@ const statLabels: {
     style: {
       cardClassName: "border-rose-200 bg-rose-50/95",
       shortLabelClassName: "text-rose-700",
-      helperClassName: "text-rose-700/80",
+
     },
   },
   {
@@ -87,7 +86,7 @@ const statLabels: {
     style: {
       cardClassName: "border-emerald-200 bg-emerald-50/90",
       shortLabelClassName: "text-emerald-700",
-      helperClassName: "text-emerald-700/80",
+
     },
   },
 ];
@@ -95,7 +94,6 @@ const statLabels: {
 const freeThrowStyle: StatStyle = {
   cardClassName: "border-emerald-200 bg-emerald-50/90",
   shortLabelClassName: "text-emerald-700",
-  helperClassName: "text-emerald-700/80",
 };
 
 function getPlayerNameParts(name?: string | null) {
@@ -148,7 +146,7 @@ export function GameStatsBoard({
   const [stats, setStats] = useState(initialStats);
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
-  const [viewportSize, setViewportSize] = useState({ width: 1024, height: 900 });
+  const [viewportSize, setViewportSize] = useState({ width: 1024 });
   const [saveMessage, setSaveMessage] = useState("");
   const [toastMessage, setToastMessage] = useState("");
   const [undoAction, setUndoAction] = useState<UndoAction | null>(null);
@@ -169,10 +167,7 @@ export function GameStatsBoard({
 
   useEffect(() => {
     function updateViewportSize() {
-      setViewportSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
+      setViewportSize({ width: window.innerWidth });
     }
 
     updateViewportSize();
@@ -184,22 +179,13 @@ export function GameStatsBoard({
   const rosterLayout = useMemo(() => {
     const playerCount = Math.max(stats.length, 1);
     const isPhone = viewportSize.width < 640;
-    const isTablet = viewportSize.width >= 640 && viewportSize.width < 1180;
-    const chromeHeight = isPhone ? 170 : isTablet ? 200 : 220;
-    const targetColumns = isPhone ? 2 : isTablet ? 2 : 3;
+    const targetColumns = isPhone ? 2 : 3;
     const columns = Math.max(1, Math.min(playerCount, targetColumns));
     const rows = Math.max(1, Math.ceil(playerCount / columns));
-    const availableHeight = Math.max(viewportSize.height - chromeHeight, isPhone ? 420 : 620);
-    const rowHeight = Math.max(
-      isPhone ? 132 : 170,
-      Math.min(availableHeight / rows, isPhone ? 220 : 280),
-    );
 
     return {
       columns,
-      rowHeight,
-      compact: rowHeight < 115,
-      ultraCompact: rowHeight < 92,
+      rows,
     };
   }, [stats.length, viewportSize]);
 
@@ -323,10 +309,10 @@ export function GameStatsBoard({
         </div>
       ) : null}
       <div
-        className="grid flex-1 gap-3 overflow-hidden sm:gap-4"
+        className="grid min-h-0 flex-1 gap-3 sm:gap-4"
         style={{
           gridTemplateColumns: `repeat(${rosterLayout.columns}, minmax(0, 1fr))`,
-          gridAutoRows: `${rosterLayout.rowHeight}px`,
+          gridTemplateRows: `repeat(${rosterLayout.rows}, minmax(0, 1fr))`,
         }}
       >
         {stats.map((statLine) => {
@@ -335,41 +321,19 @@ export function GameStatsBoard({
           return (
             <button
               key={statLine.id}
-              className={`h-full rounded-[1.75rem] border border-white/10 bg-[#10233b]/92 text-left shadow-[0_20px_60px_rgba(0,0,0,0.24)] transition-all hover:-translate-y-0.5 hover:bg-[#153153] ${
-                rosterLayout.ultraCompact ? "p-3" : rosterLayout.compact ? "p-4" : "p-5"
-              }`}
+              className="min-h-0 rounded-[1.75rem] border border-white/10 bg-[#10233b]/92 p-4 text-left shadow-[0_20px_60px_rgba(0,0,0,0.24)] transition-all hover:-translate-y-0.5 hover:bg-[#153153]"
               onClick={() => setSelectedPlayerId(statLine.player_id)}
               type="button"
             >
               <div className="flex h-full items-center">
                 <div className="min-w-0">
-                  <p
-                    className={`font-semibold tracking-tight text-sky-700 ${
-                      rosterLayout.ultraCompact
-                        ? "text-lg leading-5"
-                        : rosterLayout.compact
-                          ? "text-xl leading-6"
-                          : "text-3xl leading-8"
-                    }`}
-                  >
+                  <p className="text-xl font-semibold leading-6 tracking-tight text-sky-700">
                     {statLine.player?.jersey_number ? `#${statLine.player.jersey_number}` : "#"}
                   </p>
-                  <p
-                    className={`mt-1 font-semibold tracking-tight text-white ${
-                      rosterLayout.ultraCompact
-                        ? "text-lg leading-5"
-                        : rosterLayout.compact
-                          ? "text-xl leading-6"
-                          : "text-3xl leading-8"
-                    }`}
-                  >
+                  <p className="mt-1 text-3xl font-semibold leading-8 tracking-tight text-white">
                     {nameParts.firstName}
                   </p>
-                  <p
-                    className={`mt-2 text-slate-500 ${
-                      rosterLayout.ultraCompact ? "text-xs" : "text-sm"
-                    }`}
-                  >
+                  <p className="mt-1 text-lg text-slate-500">
                     {nameParts.lastName || "Tap to update stats"}
                   </p>
                 </div>

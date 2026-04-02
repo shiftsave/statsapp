@@ -19,9 +19,11 @@ import { Label } from "@/components/ui/label";
 export function CompleteGameDialog({
   gameId,
   opponentName,
+  triggerClassName,
 }: {
   gameId: string;
   opponentName: string | null;
+  triggerClassName?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [teamScore, setTeamScore] = useState("");
@@ -68,7 +70,7 @@ export function CompleteGameDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Button
-        className="min-h-12 rounded-[1rem] bg-[#2e86ff] px-5 uppercase tracking-[0.14em]"
+        className={triggerClassName ?? "min-h-12 rounded-[1rem] bg-[#2e86ff] px-5 uppercase tracking-[0.14em]"}
         onClick={() => setOpen(true)}
         type="button"
       >

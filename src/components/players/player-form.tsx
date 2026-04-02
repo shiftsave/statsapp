@@ -9,9 +9,6 @@ export function PlayerForm() {
     <Card className="northland-panel border-white/10">
       <CardHeader>
         <CardTitle className="text-3xl uppercase tracking-tight text-white">Add a player</CardTitle>
-        <CardDescription className="text-[#bdd0e7]">
-          Create a player record directly from the dashboard.
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <form action={addPlayerAction} className="grid gap-4 sm:grid-cols-[1fr_140px_auto]">
