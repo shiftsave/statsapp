@@ -1,4 +1,5 @@
-import { togglePlayerStatusAction } from "@/app/actions";
+import { deletePlayerAction, togglePlayerStatusAction } from "@/app/actions";
+import { ConfirmDelete } from "@/components/shared/confirm-delete";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -68,13 +69,21 @@ export function PlayerList({ players }: { players: Player[] }) {
                     <Badge className="bg-[#243244] text-[#bdd0e7] hover:bg-[#243244]" variant="outline">Archived</Badge>
                   </div>
                 </div>
-                <form action={togglePlayerStatusAction}>
-                  <input name="player_id" type="hidden" value={player.id} />
-                  <input name="next_value" type="hidden" value="true" />
-                  <Button className="min-h-12 rounded-[1rem] uppercase tracking-[0.14em]" type="submit" variant="outline">
-                    Restore
-                  </Button>
-                </form>
+                <div className="flex gap-2">
+                  <form action={togglePlayerStatusAction}>
+                    <input name="player_id" type="hidden" value={player.id} />
+                    <input name="next_value" type="hidden" value="true" />
+                    <Button className="min-h-12 rounded-[1rem] uppercase tracking-[0.14em]" type="submit" variant="outline">
+                      Restore
+                    </Button>
+                  </form>
+                  <ConfirmDelete
+                    action={deletePlayerAction}
+                    title="Delete player?"
+                    description="This will permanently delete this player. Players with game history cannot be deleted."
+                    hiddenFields={{ player_id: player.id }}
+                  />
+                </div>
               </div>
             ))
           )}

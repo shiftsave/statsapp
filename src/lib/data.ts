@@ -430,6 +430,52 @@ export async function completeGame(
   scores: { teamScore: number; opponentScore: number },
 ) {
   const supabase = createSupabaseServerClient();
+
+  // Flush time for players still on court
+  const { data: clock } = await supabase
+    .from("game_clock")
+    .select("elapsed_seconds")
+    .eq("game_id", gameId)
+    .maybeSingle();
+
+  const gameElapsed = clock?.elapsed_seconds ?? 0;
+
+  const { data: onCourtPlayers } = await supabase
+    .from("player_game_stats")
+    .select("player_id, total_time_played_seconds")
+    .eq("game_id", gameId)
+    .eq("is_on_court", true);
+
+  if (onCourtPlayers && onCourtPlayers.length > 0) {
+    for (const player of onCourtPlayers) {
+      // Find their last sub-in time
+      const { data: lastSubIn } = await supabase
+        .from("player_substitutions")
+        .select("elapsed_seconds")
+        .eq("game_id", gameId)
+        .eq("player_in_id", player.player_id)
+        .order("elapsed_seconds", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const onCourtSince = lastSubIn?.elapsed_seconds ?? 0;
+      const stint = Math.max(0, gameElapsed - onCourtSince);
+      const newTotal = (player.total_time_played_seconds ?? 0) + stint;
+
+      await supabase
+        .from("player_game_stats")
+        .update({ is_on_court: false, total_time_played_seconds: newTotal })
+        .eq("game_id", gameId)
+        .eq("player_id", player.player_id);
+    }
+  }
+
+  // Stop the clock
+  await supabase
+    .from("game_clock")
+    .update({ status: "stopped" })
+    .eq("game_id", gameId);
+
   const { error } = await supabase
     .from("games")
     .update({
@@ -483,6 +529,18 @@ export async function savePlayerReflection(input: {
   }
 }
 
+export async function deletePlayer(playerId: string) {
+  const supabase = createSupabaseServerClient();
+  const { error } = await supabase.from("players").delete().eq("id", playerId);
+  if (error) throw error;
+}
+
+export async function deleteGame(gameId: string) {
+  const supabase = createSupabaseServerClient();
+  const { error } = await supabase.from("games").delete().eq("id", gameId);
+  if (error) throw error;
+}
+
 export async function updateGameClock(
   gameId: string,
   update: { status?: "running" | "stopped"; elapsed_seconds?: number; current_period?: number; started_at?: string | null },
@@ -520,7 +578,31 @@ export async function performSubstitution(input: {
     throw subError;
   }
 
-  // Swap court status
+  // Calculate time played for outgoing player
+  // Find their last sub-in time (or 0 if they were a starter)
+  const { data: lastSubIn } = await supabase
+    .from("player_substitutions")
+    .select("elapsed_seconds")
+    .eq("game_id", input.gameId)
+    .eq("player_in_id", input.playerOutId)
+    .order("elapsed_seconds", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const onCourtSince = lastSubIn?.elapsed_seconds ?? 0;
+  const stint = Math.max(0, input.elapsedSeconds - onCourtSince);
+
+  // Get current total and add the stint
+  const { data: currentStats } = await supabase
+    .from("player_game_stats")
+    .select("total_time_played_seconds")
+    .eq("game_id", input.gameId)
+    .eq("player_id", input.playerOutId)
+    .single();
+
+  const newTotal = (currentStats?.total_time_played_seconds ?? 0) + stint;
+
+  // Swap court status + update time for outgoing player
   const { error: inError } = await supabase
     .from("player_game_stats")
     .update({ is_on_court: true })
@@ -533,7 +615,7 @@ export async function performSubstitution(input: {
 
   const { error: outError } = await supabase
     .from("player_game_stats")
-    .update({ is_on_court: false })
+    .update({ is_on_court: false, total_time_played_seconds: newTotal })
     .eq("game_id", input.gameId)
     .eq("player_id", input.playerOutId);
 

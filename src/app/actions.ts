@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { completeGame, createGameWithRoster, createPlayer, togglePlayerActive } from "@/lib/data";
+import { completeGame, createGameWithRoster, createPlayer, deleteGame, deletePlayer, togglePlayerActive } from "@/lib/data";
 import { hasSupabaseEnv } from "@/lib/env";
 
 function ensureSupabase() {
@@ -99,4 +99,27 @@ export async function completeGameAction(formData: FormData) {
   revalidatePath("/games");
   revalidatePath("/");
   redirect(`/games/${gameId}/report`);
+}
+
+export async function deletePlayerAction(formData: FormData) {
+  ensureSupabase();
+
+  const playerId = String(formData.get("player_id") ?? "");
+  if (!playerId) throw new Error("Player id is required.");
+
+  await deletePlayer(playerId);
+  revalidatePath("/");
+  revalidatePath("/players");
+  revalidatePath("/games");
+}
+
+export async function deleteGameAction(formData: FormData) {
+  ensureSupabase();
+
+  const gameId = String(formData.get("game_id") ?? "");
+  if (!gameId) throw new Error("Game id is required.");
+
+  await deleteGame(gameId);
+  revalidatePath("/");
+  revalidatePath("/games");
 }

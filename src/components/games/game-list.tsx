@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { deleteGameAction } from "@/app/actions";
+import { ConfirmDelete } from "@/components/shared/confirm-delete";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatGameDate } from "@/lib/format";
@@ -57,6 +59,12 @@ export function GameList({ games }: { games: Game[] }) {
                     View report
                   </Link>
                 ) : null}
+                <ConfirmDelete
+                  action={deleteGameAction}
+                  title="Delete game?"
+                  description="This will permanently delete this game and all associated stats, substitutions, and reflections."
+                  hiddenFields={{ game_id: game.id }}
+                />
               </div>
             </div>
           ))

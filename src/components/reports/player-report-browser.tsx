@@ -23,6 +23,13 @@ import type {
   ReflectionQuestion,
 } from "@/types/app";
 
+function formatMinutes(totalSeconds: number) {
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  if (m === 0 && s === 0) return "0:00";
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
 const statSummary = [
   { key: "offensive_rebounds", label: "Offensive rebounds" },
   { key: "defensive_rebounds", label: "Defensive rebounds" },
@@ -225,14 +232,14 @@ export function PlayerReportBrowser({
                   key={statLine.id}
                   className={`w-full rounded-2xl border px-4 py-3 text-left transition-colors ${
                     isSelected
-                      ? "border-slate-950 bg-slate-950 text-white"
-                      : "border-slate-200 bg-white hover:border-slate-400"
+                      ? "border-[#2e86ff] bg-[#2e86ff]/20 text-white"
+                      : "border-white/10 bg-[#10233b] hover:border-white/20"
                   }`}
                   onClick={() => setSelectedPlayerId(statLine.player_id)}
                   type="button"
                 >
                   <p className="font-medium">{statLine.player?.name ?? "Player"}</p>
-                  <p className={`text-sm ${isSelected ? "text-slate-200" : "text-slate-500"}`}>
+                  <p className={`text-sm ${isSelected ? "text-slate-400" : "text-slate-500"}`}>
                     {statLine.player?.jersey_number
                       ? `#${statLine.player.jersey_number}`
                       : "No jersey number"}
@@ -243,17 +250,9 @@ export function PlayerReportBrowser({
           </CardContent>
         </Card>
         <div className="space-y-5">
-          <Card className="overflow-hidden">
-            <CardHeader className="border-b bg-slate-950 text-white">
-              <CardTitle className="text-2xl">
-                {selectedReport.player?.name ?? "Player report"}
-              </CardTitle>
-              <CardDescription className="mt-1 text-slate-300">
-                Single-game report and post-game reflection.
-              </CardDescription>
-            </CardHeader>
+          <Card>
             <CardContent className="space-y-5 p-5">
-              <div className="rounded-3xl bg-sky-50 p-5 text-sky-950">
+              <div className="rounded-3xl border border-white/10 bg-[#10233b] p-5 text-white">
                 <p className="text-sm font-semibold uppercase tracking-[0.24em] text-sky-700">
                   Summary
                 </p>
@@ -261,10 +260,16 @@ export function PlayerReportBrowser({
               </div>
               <Separator />
               <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border border-[#2e86ff]/30 bg-[#10233b] px-4 py-4">
+                  <p className="text-sm text-[#7fb2ff]">Time played</p>
+                  <p className="mt-2 text-3xl font-semibold text-white">
+                    {formatMinutes(selectedReport.total_time_played_seconds)}
+                  </p>
+                </div>
                 {statSummary.map((item) => (
-                  <div key={item.key} className="rounded-2xl border bg-slate-50/70 px-4 py-4">
+                  <div key={item.key} className="rounded-2xl border border-white/10 bg-[#10233b] px-4 py-4">
                     <p className="text-sm text-slate-500">{item.label}</p>
-                    <p className="mt-2 text-3xl font-semibold text-slate-950">
+                    <p className="mt-2 text-3xl font-semibold text-white">
                       {selectedReport[item.key]}
                     </p>
                   </div>
@@ -274,7 +279,7 @@ export function PlayerReportBrowser({
               <div className="space-y-4">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                   <div>
-                    <h3 className="text-xl font-semibold text-slate-950">Game reflection</h3>
+                    <h3 className="text-xl font-semibold text-white">Game reflection</h3>
                     <p className="text-sm text-slate-500">
                       Rate each statement from not at all to definitely.
                     </p>
@@ -285,8 +290,8 @@ export function PlayerReportBrowser({
                 </div>
                 <div className="space-y-4">
                   {questions.map((question) => (
-                    <div key={question.id} className="rounded-2xl border bg-slate-50/70 p-4">
-                      <p className="text-base leading-7 text-slate-950">{question.prompt}</p>
+                    <div key={question.id} className="rounded-2xl border border-white/10 bg-[#10233b] p-4">
+                      <p className="text-base leading-7 text-white">{question.prompt}</p>
                       <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
                         {responseOptions.map((option) => {
                           const isSelected = currentForm.answers[question.id] === option.value;
@@ -296,8 +301,8 @@ export function PlayerReportBrowser({
                               key={option.value}
                               className={`rounded-2xl border px-4 py-3 text-sm font-medium transition-colors ${
                                 isSelected
-                                  ? "border-slate-950 bg-slate-950 text-white"
-                                  : "border-slate-200 bg-white text-slate-700 hover:border-slate-400"
+                                  ? "border-[#2e86ff] bg-[#2e86ff]/20 text-white"
+                                  : "border-white/10 bg-[#10233b] text-slate-300 hover:border-white/20"
                               }`}
                               onClick={() => chooseResponse(question, option.value)}
                               type="button"
@@ -312,7 +317,7 @@ export function PlayerReportBrowser({
                 </div>
                 <div className="grid gap-4 lg:grid-cols-2">
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-slate-700">My goal for the next game</p>
+                    <p className="text-sm font-semibold text-slate-300">My goal for the next game</p>
                     <Textarea
                       onChange={(event) =>
                         updateForm((current) => ({
@@ -325,7 +330,7 @@ export function PlayerReportBrowser({
                     />
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-slate-700">
+                    <p className="text-sm font-semibold text-slate-300">
                       My favourite thing about the game was
                     </p>
                     <Textarea
@@ -363,8 +368,8 @@ export function PlayerReportBrowser({
                 <p className="text-sm text-muted-foreground">No past reflections yet.</p>
               ) : (
                 history.map((entry) => (
-                  <div key={entry.game_id} className="rounded-2xl border bg-slate-50/70 p-4">
-                    <p className="font-semibold text-slate-950">
+                  <div key={entry.game_id} className="rounded-2xl border border-white/10 bg-[#10233b] p-4">
+                    <p className="font-semibold text-white">
                       {entry.opponent ? `vs ${entry.opponent}` : "Game reflection"} •{" "}
                       {formatGameDate(entry.game_date)}
                     </p>
@@ -376,11 +381,11 @@ export function PlayerReportBrowser({
                             ?.label ?? "No response";
 
                         return (
-                          <div key={question.id} className="rounded-2xl border bg-white p-3">
+                          <div key={question.id} className="rounded-2xl border border-white/10 bg-[#0c1f34] p-3">
                             <p className="text-sm text-slate-500">{question.prompt}</p>
-                            <p className="mt-2 font-medium text-slate-950">{label}</p>
+                            <p className="mt-2 font-medium text-white">{label}</p>
                             {answer?.response_note ? (
-                              <p className="mt-2 text-sm text-slate-600">{answer.response_note}</p>
+                              <p className="mt-2 text-sm text-slate-400">{answer.response_note}</p>
                             ) : null}
                           </div>
                         );
@@ -388,15 +393,15 @@ export function PlayerReportBrowser({
                     </div>
                     {entry.note?.next_game_goal || entry.note?.favorite_thing ? (
                       <div className="mt-4 grid gap-3 lg:grid-cols-2">
-                        <div className="rounded-2xl border bg-white p-3">
+                        <div className="rounded-2xl border border-white/10 bg-[#0c1f34] p-3">
                           <p className="text-sm text-slate-500">Goal for next game</p>
-                          <p className="mt-2 text-slate-950">
+                          <p className="mt-2 text-white">
                             {entry.note?.next_game_goal || "No goal recorded."}
                           </p>
                         </div>
-                        <div className="rounded-2xl border bg-white p-3">
+                        <div className="rounded-2xl border border-white/10 bg-[#0c1f34] p-3">
                           <p className="text-sm text-slate-500">Favourite thing</p>
-                          <p className="mt-2 text-slate-950">
+                          <p className="mt-2 text-white">
                             {entry.note?.favorite_thing || "No note recorded."}
                           </p>
                         </div>
