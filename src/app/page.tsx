@@ -1,65 +1,154 @@
-import Image from "next/image";
+import Link from "next/link";
 
-export default function Home() {
+import { AppShell } from "@/components/layout/app-shell";
+import { SetupCallout } from "@/components/shared/setup-callout";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getDashboardData } from "@/lib/data";
+import { hasSupabaseEnv } from "@/lib/env";
+import { formatGameDate } from "@/lib/format";
+
+const primaryLinkClass =
+  "inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90";
+
+const outlineLinkClass =
+  "inline-flex h-10 items-center justify-center rounded-lg border border-input bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground";
+
+const featureCards = [
+  {
+    title: "Manage players",
+    description: "Create player records in the UI and keep future game rosters in sync.",
+    href: "/players",
+  },
+  {
+    title: "Track game stats",
+    description: "Open a game and update rebounds, steals, turnovers, baskets, and free throws.",
+    href: "/games",
+  },
+  {
+    title: "Open player reports",
+    description: "After the final whistle, let each player click their name for a simple assessment.",
+    href: "/games",
+  },
+];
+
+export default async function Home() {
+  const dashboardData = hasSupabaseEnv ? await getDashboardData() : null;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <AppShell currentPath="/">
+      <div className="space-y-5">
+        {!hasSupabaseEnv ? <SetupCallout /> : null}
+        <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
+          <Card className="overflow-hidden border-none bg-slate-950 text-white shadow-[0_24px_70px_rgba(15,23,42,0.35)]">
+            <CardHeader>
+              <Badge className="w-fit bg-sky-300 text-slate-950 hover:bg-sky-300">
+                Simple game-day workflow
+              </Badge>
+              <CardTitle className="mt-4 text-4xl leading-tight sm:text-5xl">
+                A clean MVP for player-by-player basketball reports.
+              </CardTitle>
+              <CardDescription className="max-w-2xl text-base leading-7 text-slate-300">
+                The app is designed for fast use on the sideline: create players, start a game,
+                track the stat line, and finish with an automatic 1-5 assessment.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-3">
+              <Link className={`${primaryLinkClass} h-11 px-5`} href="/players">
+                Set up players
+              </Link>
+              <Link className={`${outlineLinkClass} h-11 px-5`} href="/games">
+                Create a game
+              </Link>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>MVP defaults</CardTitle>
+              <CardDescription>The app currently follows the agreed first-release choices.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-slate-600">
+              <p>One stat row per player per game.</p>
+              <p>Combined field goals in a single made baskets field.</p>
+              <p>Automatic 1-5 assessment, derived from the stat line.</p>
+              <p>Game-specific reports only.</p>
+              <p>Archive players instead of deleting history.</p>
+            </CardContent>
+          </Card>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="grid gap-5 lg:grid-cols-3">
+          {featureCards.map((card) => (
+            <Card key={card.title}>
+              <CardHeader>
+                <CardTitle>{card.title}</CardTitle>
+                <CardDescription>{card.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Link className={outlineLinkClass} href={card.href}>
+                  Open
+                </Link>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      </main>
-    </div>
+        {dashboardData ? (
+          <div className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
+            <Card>
+              <CardHeader>
+                <CardTitle>Current roster</CardTitle>
+                <CardDescription>
+                  {dashboardData.players.filter((player) => player.is_active).length} active players
+                  ready for the next game.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {dashboardData.players.slice(0, 6).map((player) => (
+                  <div key={player.id} className="flex items-center justify-between rounded-2xl border px-4 py-3">
+                    <div>
+                      <p className="font-medium">{player.name}</p>
+                      <p className="text-sm text-slate-500">
+                        {player.jersey_number ? `#${player.jersey_number}` : "No jersey number"}
+                      </p>
+                    </div>
+                    <Badge variant={player.is_active ? "secondary" : "outline"}>
+                      {player.is_active ? "Active" : "Archived"}
+                    </Badge>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent games</CardTitle>
+                <CardDescription>Continue stat entry or open a finished report.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {dashboardData.recentGames.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No games yet.</p>
+                ) : (
+                  dashboardData.recentGames.map((game) => (
+                    <div
+                      key={game.id}
+                      className="flex flex-col gap-3 rounded-2xl border px-4 py-4 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div>
+                        <p className="font-medium">{game.opponent ? `vs ${game.opponent}` : "Game session"}</p>
+                        <p className="text-sm text-slate-500">
+                          {formatGameDate(game.game_date)}
+                          {game.location ? ` • ${game.location}` : ""}
+                        </p>
+                      </div>
+                      <Link className={outlineLinkClass} href={`/games/${game.id}`}>
+                        Open
+                      </Link>
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        ) : null}
+      </div>
+    </AppShell>
   );
 }
