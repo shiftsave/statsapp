@@ -33,17 +33,17 @@ export default async function GameReportPage({
   return (
     <AppShell currentPath="/games">
       <div className="space-y-5">
-        <Card>
+        <Card className="northland-panel border-white/10">
           <CardHeader>
-            <CardTitle className="text-3xl">
+            <CardTitle className="text-4xl font-bold uppercase tracking-tight text-white">
               Post-game reports {game.opponent ? `vs ${game.opponent}` : ""}
             </CardTitle>
-            <CardDescription className="mt-2 text-base">
+            <CardDescription className="mt-2 text-base text-[#bdd0e7]">
               {formatGameDate(game.game_date)}
               {game.location ? ` • ${game.location}` : ""}
             </CardDescription>
           </CardHeader>
-          <CardContent className="pt-0 text-sm leading-6 text-slate-600">
+          <CardContent className="pt-0 text-sm leading-6 text-[#bdd0e7]">
             Players can select their name to review their game stats, complete their reflection,
             and revisit past reflections.
           </CardContent>

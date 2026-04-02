@@ -6,20 +6,29 @@ import { Label } from "@/components/ui/label";
 
 export function PlayerForm() {
   return (
-    <Card>
+    <Card className="northland-panel border-white/10">
       <CardHeader>
-        <CardTitle>Add a player</CardTitle>
-        <CardDescription>Create a player record directly from the UI.</CardDescription>
+        <CardTitle className="text-3xl uppercase tracking-tight text-white">Add a player</CardTitle>
+        <CardDescription className="text-[#bdd0e7]">
+          Create a player record directly from the dashboard.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form action={addPlayerAction} className="grid gap-4 sm:grid-cols-[1fr_140px_auto]">
           <div className="grid gap-2">
-            <Label htmlFor="name">Player name</Label>
-            <Input id="name" name="name" placeholder="Jordan Lee" required />
+            <Label className="text-[#d7b354]" htmlFor="name">Player name</Label>
+            <Input
+              className="min-h-14 rounded-[1.25rem] border-white/10 bg-[#0c1f34] text-white placeholder:text-[#6e89aa]"
+              id="name"
+              name="name"
+              placeholder="Jordan Lee"
+              required
+            />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="jersey_number">Jersey #</Label>
+            <Label className="text-[#d7b354]" htmlFor="jersey_number">Jersey #</Label>
             <Input
+              className="min-h-14 rounded-[1.25rem] border-white/10 bg-[#0c1f34] text-white placeholder:text-[#6e89aa]"
               id="jersey_number"
               name="jersey_number"
               inputMode="numeric"
@@ -30,7 +39,7 @@ export function PlayerForm() {
             />
           </div>
           <div className="flex items-end">
-            <Button className="w-full sm:w-auto" type="submit">
+            <Button className="min-h-14 w-full rounded-[1.25rem] bg-[#2e86ff] px-6 uppercase tracking-[0.16em] sm:w-auto" type="submit">
               Save player
             </Button>
           </div>

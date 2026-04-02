@@ -10,33 +10,33 @@ export function PlayerList({ players }: { players: Player[] }) {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[1.35fr_1fr]">
-      <Card>
+      <Card className="northland-panel border-white/10">
         <CardHeader>
-          <CardTitle>Active players</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-3xl uppercase tracking-tight text-white">Active players</CardTitle>
+          <CardDescription className="text-[#bdd0e7]">
             Active players are automatically included when a new game is created.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           {activePlayers.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No active players yet.</p>
+            <p className="text-sm text-[#9fb6d4]">No active players yet.</p>
           ) : (
             activePlayers.map((player) => (
               <div
                 key={player.id}
-                className="flex items-center justify-between rounded-2xl border bg-slate-50/60 px-4 py-3"
+                className="flex min-h-20 items-center justify-between rounded-[1.35rem] border border-white/10 bg-[#0d2137] px-4 py-4"
               >
                 <div className="space-y-1">
-                  <p className="font-medium text-slate-950">{player.name}</p>
-                  <div className="flex items-center gap-2 text-sm text-slate-500">
+                  <p className="text-2xl font-medium uppercase tracking-tight text-white">{player.name}</p>
+                  <div className="flex items-center gap-2 text-sm text-[#9fb6d4]">
                     {player.jersey_number ? <span>#{player.jersey_number}</span> : null}
-                    <Badge variant="secondary">Active</Badge>
+                    <Badge className="bg-[#173a27] text-[#9de189] hover:bg-[#173a27]">Active</Badge>
                   </div>
                 </div>
                 <form action={togglePlayerStatusAction}>
                   <input name="player_id" type="hidden" value={player.id} />
                   <input name="next_value" type="hidden" value="false" />
-                  <Button type="submit" variant="secondary">
+                  <Button className="min-h-12 rounded-[1rem] uppercase tracking-[0.14em]" type="submit" variant="secondary">
                     Archive
                   </Button>
                 </form>
@@ -45,33 +45,33 @@ export function PlayerList({ players }: { players: Player[] }) {
           )}
         </CardContent>
       </Card>
-      <Card>
+      <Card className="northland-panel border-white/10">
         <CardHeader>
-          <CardTitle>Archived players</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-3xl uppercase tracking-tight text-white">Archived players</CardTitle>
+          <CardDescription className="text-[#bdd0e7]">
             History stays intact, but archived players are hidden from new games.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           {archivedPlayers.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No archived players.</p>
+            <p className="text-sm text-[#9fb6d4]">No archived players.</p>
           ) : (
             archivedPlayers.map((player) => (
               <div
                 key={player.id}
-                className="flex items-center justify-between rounded-2xl border px-4 py-3"
+                className="flex min-h-20 items-center justify-between rounded-[1.35rem] border border-white/10 bg-[#0d2137] px-4 py-4"
               >
                 <div className="space-y-1">
-                  <p className="font-medium">{player.name}</p>
-                  <div className="flex items-center gap-2 text-sm text-slate-500">
+                  <p className="text-2xl font-medium uppercase tracking-tight text-white">{player.name}</p>
+                  <div className="flex items-center gap-2 text-sm text-[#9fb6d4]">
                     {player.jersey_number ? <span>#{player.jersey_number}</span> : null}
-                    <Badge variant="outline">Archived</Badge>
+                    <Badge className="bg-[#243244] text-[#bdd0e7] hover:bg-[#243244]" variant="outline">Archived</Badge>
                   </div>
                 </div>
                 <form action={togglePlayerStatusAction}>
                   <input name="player_id" type="hidden" value={player.id} />
                   <input name="next_value" type="hidden" value="true" />
-                  <Button type="submit" variant="outline">
+                  <Button className="min-h-12 rounded-[1rem] uppercase tracking-[0.14em]" type="submit" variant="outline">
                     Restore
                   </Button>
                 </form>

@@ -14,6 +14,16 @@ export default async function PlayersPage() {
         {!hasSupabaseEnv ? <SetupCallout /> : null}
         {hasSupabaseEnv ? (
           <>
+            <section className="northland-panel p-5 sm:p-6">
+              <p className="northland-kicker">Roster management</p>
+              <h2 className="mt-4 text-4xl font-bold uppercase leading-[0.88] tracking-tight text-white">
+                Build the squad card by card.
+              </h2>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-[#bdd0e7]">
+                Keep names, numbers, and active status clean so game creation stays frictionless on
+                mobile.
+              </p>
+            </section>
             <PlayerForm />
             <PlayerList players={players} />
           </>

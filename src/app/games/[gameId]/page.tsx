@@ -10,7 +10,7 @@ import { getGameWithStats } from "@/lib/data";
 import { hasSupabaseEnv } from "@/lib/env";
 
 const outlineLinkClass =
-  "inline-flex h-10 items-center justify-center rounded-lg border border-input bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground";
+  "inline-flex min-h-12 items-center justify-center rounded-[1rem] border border-white/10 bg-[#102844] px-4 py-2 text-sm font-medium uppercase tracking-[0.14em] text-white transition-colors hover:bg-[#153153]";
 
 export default async function GameDetailPage({
   params,
@@ -31,14 +31,21 @@ export default async function GameDetailPage({
   const { game, stats } = gameData;
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,_#f8fafc_0%,_#eef2ff_100%)]">
-      <div className="mx-auto flex min-h-screen max-w-7xl flex-col px-4 py-4 sm:px-6">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-[1.75rem] border bg-white/90 px-4 py-3 shadow-sm backdrop-blur">
+    <div className="h-screen overflow-hidden">
+      <div className="mx-auto flex h-screen max-w-7xl flex-col px-4 py-3 sm:px-6 sm:py-4">
+        <div className="northland-surface mb-3 flex flex-wrap items-center justify-between gap-3 px-4 py-3">
           <div className="flex flex-wrap items-center gap-3">
             <Link className={outlineLinkClass} href="/games">
               Back to games
             </Link>
-            <Badge variant={game.status === "completed" ? "secondary" : "default"}>
+            <Badge
+              className={
+                game.status === "completed"
+                  ? "bg-[#173a27] text-[#9de189] hover:bg-[#173a27]"
+                  : "bg-[#12345e] text-[#9ac7ff] hover:bg-[#12345e]"
+              }
+              variant={game.status === "completed" ? "secondary" : "default"}
+            >
               {game.status === "completed" ? "Completed" : "In progress"}
             </Badge>
           </div>
@@ -49,7 +56,9 @@ export default async function GameDetailPage({
             {game.status !== "completed" ? (
               <form action={completeGameAction}>
                 <input name="game_id" type="hidden" value={game.id} />
-                <Button type="submit">Complete game</Button>
+                <Button className="min-h-12 rounded-[1rem] bg-[#2e86ff] px-5 uppercase tracking-[0.14em]" type="submit">
+                  Complete game
+                </Button>
               </form>
             ) : null}
           </div>
